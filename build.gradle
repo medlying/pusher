@@ -1,0 +1,72 @@
+plugins {
+    id 'java'
+}
+
+allprojects {
+    group 'com.sodacar.pusher'
+    version '0.0.1-SNAPSHOT'
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'maven'
+
+    ext {
+        soda_guice = '1.0.1'
+        jpush = '3.3.10'
+    }
+    repositories {
+        repositories {
+            maven {
+                url "https://nexus.sodacar.com/repository/maven-snapshots"
+                credentials {
+                    username = System.env.sodaMavenDev ?: sodaMavenDev
+                    password = System.env.sodaMavenDevPassword ?: sodaMavenDevPassword
+                }
+            }
+            maven {
+                url "https://nexus.sodacar.com/repository/maven-releases"
+                credentials {
+                    username = System.env.sodaMavenDev ?: sodaMavenDev
+                    password = System.env.sodaMavenDevPassword ?: sodaMavenDevPassword
+                }
+            }
+            maven {
+                url "https://nexus.sodacar.com/repository/maven-central"
+                credentials {
+                    username = System.env.sodaMavenDev ?: sodaMavenDev
+                    password = System.env.sodaMavenDevPassword ?: sodaMavenDevPassword
+                }
+            }
+            mavenCentral()
+        }
+        mavenCentral()
+    }
+
+    dependencies {
+        testCompile group: 'junit', name: 'junit', version: '4.12'
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                def deployerUsername = 'dev'
+                def deployerPassword = 'Soda@2017'
+                def artifactType = project.version.endsWith('-SNAPSHOT') ? 'snapshots' : 'releases'
+
+                repository(url: "https://nexus.sodacar.com/repository/maven-${artifactType}/") {
+                    authentication(
+                            userName: deployerUsername,
+                            password: deployerPassword
+                    )
+                }
+            }
+        }
+    }
+
+    [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+}
+
+
+
+
